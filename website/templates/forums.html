@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Forums{% endblock %}
+{% block content %}
+<h1>Forums</h1>
+<a href="{{ url_for('forums.create_forum') }}" class="btn btn-primary">Create New Forum</a>
+<ul>
+    {% for forum in forums %}
+    <li><a href="{{ url_for('forums.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

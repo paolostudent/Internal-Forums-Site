@@ -16,3 +16,16 @@ class Note(db.Model):
     date = db.Column(db.DateTime(timezone=True),default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     
+
+class Forum(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.String(1000))
+    posts = db.relationship('Post', backref='forum', lazy=True)
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(10000), nullable=False)
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    forum_id = db.Column(db.Integer, db.ForeignKey('forum.id'))
