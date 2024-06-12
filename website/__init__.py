@@ -1,11 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import path
 from flask_login import LoginManager
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
-from .forums import forums
 
 def create_app():
     app = Flask(__name__)
@@ -17,12 +16,13 @@ def create_app():
     from .auth import auth
     from .forums import forums
     
-    
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(forums, url_prefix='/')
     
-    from .models import User, Note
+    migrate = Migrate(app, db)  # Initialize Flask-Migrate
+    
+    from .models import User, Note, Post, Forum, Comment  # Import all models
     
     with app.app_context():
         db.create_all()
