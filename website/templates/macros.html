@@ -1,0 +1,26 @@
+{% macro render_comment(comment, form) %}
+<li class="media my-3">
+    <div class="media-body">
+        <h5 class="mt-0 mb-1">{{ comment.author.first_name }} on {{ comment.date.strftime('%Y-%m-%d %H:%M:%S') }}</h5>
+        {{ comment.content }}
+
+        {% if current_user.is_authenticated %}
+        <form method="POST" action="{{ url_for('forums.add_comment', forum_id=comment.post.forum_id, post_id=comment.post_id) }}" class="ml-3">
+            {{ form.hidden_tag() }}
+            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+            <div class="form-group">
+                <textarea class="form-control" name="content" placeholder="Reply to this comment">{{ form.content.data }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-secondary btn-sm">Reply</button>
+        </form>
+        {% endif %}
+
+        <ul class="list-unstyled">
+            {% for reply in comment.replies %}
+                {{ render_comment(reply, form) }}
+            {% endfor %}
+        </ul>
+    </div>
+</li>
+{% endmacro %}
+    

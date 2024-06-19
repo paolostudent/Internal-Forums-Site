@@ -2,8 +2,16 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from .models import Forum, Post, Comment
 from . import db
+from flask_wtf import FlaskForm
+from wtforms import TextAreaField, HiddenField, SubmitField
+from wtforms.validators import DataRequired
 
 forums = Blueprint('forums', __name__)
+
+class CommentForm(FlaskForm):
+    content = TextAreaField('Content', validators=[DataRequired()])
+    parent_id = HiddenField('Parent ID')  # Hidden field for the parent comment
+    submit = SubmitField('Post')
 
 @forums.route('/forums')
 def forum_home():
@@ -55,19 +63,30 @@ def create_post(forum_id):
 @forums.route('/forum/<int:forum_id>/post/<int:post_id>')
 def view_post(forum_id, post_id):
     post = Post.query.get_or_404(post_id)
-    comments = Comment.query.filter_by(post_id=post_id).all()
-    return render_template('view_post.html', post=post, comments=comments, user=current_user)
+    comments = Comment.query.filter_by(post_id=post_id, parent_id=None).all()  # Only fetch top-level comments
+    form = CommentForm()
+    return render_template('view_post.html', post=post, comments=comments, user=current_user, form=form)
 
 @forums.route('/forum/<int:forum_id>/post/<int:post_id>/comment', methods=['POST'])
 @login_required
 def add_comment(forum_id, post_id):
-    content = request.form.get('content')
-    if not content:
-        flash('Comment content is required!', category='error')
-    else:
+    form = CommentForm()
+    if form.validate_on_submit():
+        content = form.content.data
         new_comment = Comment(content=content, user_id=current_user.id, post_id=post_id)
         db.session.add(new_comment)
         db.session.commit()
         flash('Comment added!', category='success')
     return redirect(url_for('forums.view_post', forum_id=forum_id, post_id=post_id))
 
+@forums.route('/forum/<int:forum_id>/post/<int:post_id>/comment/<int:comment_id>/reply', methods=['POST'])
+@login_required
+def reply_comment(forum_id, post_id, comment_id):
+    form = CommentForm()
+    if form.validate_on_submit():
+        content = form.content.data
+        new_reply = Comment(content=content, user_id=current_user.id, post_id=post_id, parent_id=comment_id)
+        db.session.add(new_reply)
+        db.session.commit()
+        flash('Reply added!', category='success')
+    return redirect(url_for('forums.view_post', forum_id=forum_id, post_id=post_id))

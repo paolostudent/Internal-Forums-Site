@@ -8,7 +8,7 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(150))
     password = db.Column(db.String(150))
     date = db.Column(db.DateTime(timezone=True), default=func.now())
-    notes = db.relationship('Note')
+    notes = db.relationship('Note', backref='author', lazy=True)
     posts = db.relationship('Post', backref='author', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy=True)
 
@@ -26,7 +26,7 @@ class Forum(db.Model):
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(150), nullable=False)  # Add title column
+    title = db.Column(db.String(150), nullable=False)
     content = db.Column(db.String(10000), nullable=False)
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -39,3 +39,5 @@ class Comment(db.Model):
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'))  # Self-referential foreign key
+    replies = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]), lazy=True)
