@@ -28,9 +28,10 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     content = db.Column(db.String(10000), nullable=False)
-    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    date = db.Column(db.DateTime(timezone=True), default=db.func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     forum_id = db.Column(db.Integer, db.ForeignKey('forum.id'))
+    media_filename = db.Column(db.String(255), nullable=True)  # Added media_filename column
     comments = db.relationship('Comment', backref='post', lazy=True)
 
 class Comment(db.Model):

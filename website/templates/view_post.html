@@ -6,6 +6,15 @@
 
 <hr>
 
+<p>{{ post.content }}</p>
+
+{% if post.media_filename %}
+    <p>Media Filename: {{ post.media_filename }}</p>
+    <img src="{{ url_for('static', filename='uploads/' + post.media_filename) }}" alt="Media attachment" class="img-fluid">
+{% endif %}
+
+<hr>
+
 <h2>Comments</h2>
 <ul class="list-unstyled">
     {% macro render_comment(comment) %}
