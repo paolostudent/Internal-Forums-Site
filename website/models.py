@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship, backref
 
 # Association table for many-to-many relationship between User and Forum
 user_forum_association = db.Table('user_forum_association',
@@ -29,7 +30,7 @@ class Forum(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    posts = db.relationship('Post', backref='forum', lazy=True)
+    posts = db.relationship('Post', backref='forum', lazy=True, cascade='all, delete-orphan')
     users = db.relationship('User', secondary=user_forum_association, back_populates='forums')
 
 class Post(db.Model):
@@ -39,9 +40,8 @@ class Post(db.Model):
     media_filename = db.Column(db.String(100), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     forum_id = db.Column(db.Integer, db.ForeignKey('forum.id'), nullable=False)
-    date = db.Column(db.DateTime(timezone=True), default=func.now())  # Add this line
-    comments = db.relationship('Comment', backref='post', lazy=True)
-
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    comments = db.relationship('Comment', backref='post', lazy=True, cascade='all, delete-orphan')
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,7 +49,5 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=True)
-    replies = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
+    replies = db.relationship('Comment', backref=backref('parent', remote_side=[id]), lazy='dynamic', cascade='all, delete-orphan')
     date = db.Column(db.DateTime(timezone=True), default=func.now())
-
-

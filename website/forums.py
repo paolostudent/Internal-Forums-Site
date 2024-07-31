@@ -149,3 +149,49 @@ def reply_comment(forum_title, post_id, comment_id):
         flash('Reply added!', category='success')
     return redirect(url_for('forums.view_post', forum_title=forum_title, post_id=post_id))
 
+
+@forums.route('/forums/post/<int:post_id>/delete', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    forum_title = post.forum.title
+    
+    if post.user_id != current_user.id:
+        abort(403)  # Forbidden
+    
+    db.session.delete(post)
+    db.session.commit()
+    flash('Post deleted successfully.', 'success')
+    
+    return redirect(url_for('forums.view_forum', forum_title=forum_title))
+
+@forums.route('/forums/post/<int:post_id>/comment/<int:comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(post_id, comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    forum_title = comment.post.forum.title
+    
+    if comment.user_id != current_user.id:
+        abort(403)  # Forbidden
+    
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Comment deleted successfully.', 'success')
+    
+    return redirect(url_for('forums.view_post', forum_title=forum_title, post_id=post_id))
+
+@forums.route('/forums/post/<int:post_id>/comment/<int:comment_id>/reply/<int:reply_id>/delete', methods=['POST'])
+@login_required
+def delete_reply(post_id, comment_id, reply_id):
+    reply = Comment.query.get_or_404(reply_id)
+    forum_title = reply.post.forum.title
+    
+    if reply.user_id != current_user.id:
+        abort(403)  # Forbidden
+    
+    db.session.delete(reply)
+    db.session.commit()
+    flash('Reply deleted successfully.', 'success')
+    
+    return redirect(url_for('forums.view_post', forum_title=forum_title, post_id=post_id))
+

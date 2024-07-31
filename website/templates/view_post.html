@@ -13,6 +13,12 @@
     <img src="{{ url_for('static', filename='uploads/' + post.media_filename) }}" alt="Media attachment" class="img-fluid">
 {% endif %}
 
+{% if current_user.id == post.user_id %}
+    <form method="POST" action="{{ url_for('forums.delete_post', post_id=post.id) }}" style="display: inline;">
+        <button type="submit" class="btn btn-danger">Delete Post</button>
+    </form>
+{% endif %}
+
 <hr>
 
 <h2>Comments</h2>
@@ -24,20 +30,26 @@
             {{ comment.content }}
 
             {% if current_user.is_authenticated %}
-            <form method="POST" action="{{ url_for('forums.reply_comment', forum_title=post.forum.title, post_id=post.id, comment_id=comment.id) }}" class="mt-3">
-                {{ form.hidden_tag() }}
-                {{ form.parent_id(id="parent_id", value=comment.id) }}
-                {{ form.content(class="form-control", placeholder="Reply to this comment") }}
-                {{ form.submit(class="btn btn-secondary btn-sm mt-2") }}
-            </form>
+                <form method="POST" action="{{ url_for('forums.reply_comment', forum_title=post.forum.title, post_id=post.id, comment_id=comment.id) }}" class="mt-3">
+                    {{ form.hidden_tag() }}
+                    {{ form.parent_id(id="parent_id", value=comment.id) }}
+                    {{ form.content(class="form-control", placeholder="Reply to this comment") }}
+                    {{ form.submit(class="btn btn-secondary btn-sm mt-2") }}
+                </form>
             {% endif %}
-            
+
+            {% if current_user.id == comment.user_id %}
+                <form method="POST" action="{{ url_for('forums.delete_comment', post_id=post.id, comment_id=comment.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger btn-sm mt-2">Delete Comment</button>
+                </form>
+            {% endif %}
+
             {% if comment.replies.count() > 0 %}
-            <ul class="list-unstyled ml-3">
-                {% for reply in comment.replies %}
-                    {{ render_comment(reply) }}
-                {% endfor %}
-            </ul>
+                <ul class="list-unstyled ml-3">
+                    {% for reply in comment.replies %}
+                        {{ render_comment(reply) }}
+                    {% endfor %}
+                </ul>
             {% endif %}
         </div>
     </li>
