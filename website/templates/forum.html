@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block title %}{{ forum.title }}{% endblock %}
+
+{% block header_title %}{{ forum.title }}{% endblock %}
+
 {% block content %}
-<h1>{{ forum.title }}</h1>
-<p>{{ forum.description }}</p>
+<div class="margin"></div>
+
+<h1>Latest Posts!</h1>
+
+
 <ul>
     {% for post in posts %}
     <li>
-        <a href="{{ url_for('forums.view_post', forum_title=forum.title, post_id=post.id) }}">{{ post.title }}</a> ({{ post.date }})
+        <a href="{{ url_for('forums.view_post', forum_title=forum.title, post_id=post.id) }}">{{ post.title }}</a> <p>by {{ post.author.first_name }} ({{ post.date }})</p>
     </li>
     {% endfor %}
 </ul>

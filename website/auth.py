@@ -40,7 +40,9 @@ def logout():
 
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
-    forums = Forum.query.all()
+    # Fetch all forums except 'English' and 'Religious Education'
+    forums = Forum.query.filter(~Forum.title.in_(['English', 'Religious Education'])).all()
+
     if request.method == 'POST':
         email = request.form.get('email')
         first_name = request.form.get('firstName')
@@ -62,12 +64,29 @@ def sign_up():
         elif len(selected_forum_ids) != 4:
             flash('You must select exactly 4 forums.', category='error')
         else:
+            # Check if there are any users in the database
+            is_admin = User.query.count() == 0
+
             new_user = User(
                 email=email,
                 first_name=first_name,
-                password=generate_password_hash(password1, method='scrypt:32768:8:1')
+                password=generate_password_hash(password1, method='scrypt:32768:8:1'),
+                is_admin=is_admin
             )
-            new_user.forums = Forum.query.filter(Forum.id.in_(selected_forum_ids)).all()
+
+            # Assign selected forums
+            selected_forums = Forum.query.filter(Forum.id.in_(selected_forum_ids)).all()
+
+            # Query for the 'English' and 'Religious Education' forums and add them
+            english_forum = Forum.query.filter_by(title='English').first()
+            religious_education_forum = Forum.query.filter_by(title='Religious Education').first()
+            if english_forum:
+                selected_forums.append(english_forum)
+            if religious_education_forum:
+                selected_forums.append(religious_education_forum)
+
+            new_user.forums = selected_forums
+
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)

@@ -48,7 +48,7 @@ def view_forum(forum_title):
     forum = Forum.query.filter_by(title=forum_title).first_or_404()
     if forum not in current_user.forums:
         flash("You are not subscribed to this forum.", "error")
-        return redirect(url_for('forums.forum_home'))
+        return redirect(url_for('views.home'))
     posts = Post.query.filter_by(forum_id=forum.id).all()
     return render_template('forum.html', forum=forum, posts=posts, user=current_user)
 
@@ -102,7 +102,7 @@ def view_post(forum_title, post_id):
     post = Post.query.get_or_404(post_id)
     comments = Comment.query.filter_by(post_id=post_id, parent_id=None).all()
     form = CommentForm()
-    return render_template('view_post.html', post=post, comments=comments, user=current_user, form=form)
+    return render_template('view_post.html', post=post, comments=comments, user=current_user, form=form, forum=forum)
 
 @forums.route('/forums/<string:forum_title>/post/<int:post_id>/comment', methods=['POST'])
 @login_required
@@ -156,7 +156,8 @@ def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     forum_title = post.forum.title
     
-    if post.user_id != current_user.id:
+    # Check if the current user is either the creator of the post or an admin
+    if post.user_id != current_user.id and not current_user.is_admin:
         abort(403)  # Forbidden
     
     db.session.delete(post)
@@ -171,7 +172,8 @@ def delete_comment(post_id, comment_id):
     comment = Comment.query.get_or_404(comment_id)
     forum_title = comment.post.forum.title
     
-    if comment.user_id != current_user.id:
+    # Check if the current user is either the creator of the comment or an admin
+    if comment.user_id != current_user.id and not current_user.is_admin:
         abort(403)  # Forbidden
     
     db.session.delete(comment)
@@ -186,7 +188,8 @@ def delete_reply(post_id, comment_id, reply_id):
     reply = Comment.query.get_or_404(reply_id)
     forum_title = reply.post.forum.title
     
-    if reply.user_id != current_user.id:
+    # Check if the current user is either the creator of the reply or an admin
+    if reply.user_id != current_user.id and not current_user.is_admin:
         abort(403)  # Forbidden
     
     db.session.delete(reply)
@@ -194,4 +197,3 @@ def delete_reply(post_id, comment_id, reply_id):
     flash('Reply deleted successfully.', 'success')
     
     return redirect(url_for('forums.view_post', forum_title=forum_title, post_id=post_id))
-

@@ -7,93 +7,87 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="static/main.css">
-    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+    <title>{% block title %}Default Title{% endblock %}</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-md bg-dark navbar-dark">
-      
-        
-      
-          <!-- Toggler/collapsibe Button -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      
-        <!-- Navbar links -->
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-          <ul class="navbar-nav">
-          {% if user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link" href="/home">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/forums">Forums</a>
-            </li>
-          {% for forum in user.forums %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('forums.view_forum', forum_title=forum.title) }}">{{ forum.title }}</a>
-            </li>
-          {% endfor %}
- 
-            <li class="nav-item">
-              <a class="nav-link" href="/logout">Logout</a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="/home">Home</a>
-            </li>
-              <li class="nav-item">
-               <a class="nav-link" href="/login">Login</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/sign-up">Sign Up</a>
-          {% endif %}
-          </ul>
-        </div>   
-      </nav>
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if 
-          messages %} {% for category, message in messages %} {% if category == 
-          'error' %}
-          <div class="alert alert-danger alter-dismissable fade show" role="alert">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          {% else %}
-          <div class="alert alert-success alter-dismissable fade show" role="alert">
-            {{ message }}
-            <button type="button" class"close" data-dismiss="alert">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          {% endif %} {% endfor %} {% endif %} {% endwith %}
-    <div class="container"> {% block content %}{% endblock %} </div>
+    <!-- Fixed Header -->
+    <header class="fixed-header">
+      <div class="container">
+        <h1>{% block header_title %}Default Header Title{% endblock %}</h1>
+      </div>
+    </header>
 
-    <footer id="sticky-footer" class="flex-shrink-0 py-4 bg-dark text-white-50">
-        <div class="container text-center">
-          <small> Copyright </small>
-        </div>
-    </footer>   
-    
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a class="navbar-brand" href="/">
+        <img class="editlogo" src="{{ url_for('static', filename='logo.png') }}" alt="Sancta Maria College">
+      </a>
+      
+      <!-- Navbar links -->
+      <ul class="nav flex-column">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="/home">Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="dropdownMySubjects" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              My Subjects
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMySubjects">
+              {% for forum in user.forums %}
+                <a class="dropdown-item" href="{{ url_for('forums.view_forum', forum_title=forum.title) }}">{{ forum.title }}</a>
+              {% endfor %}
+            </div>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/home">Home</a>
+          </li>
+        {% endif %}
+      </ul>
+
+      <!-- Footer section -->
+      <div class="footer">
+        {% if user.is_authenticated %}
+          <p class="greeting">Hello, {{ user.first_name }}!</p>
+          <a class="nav-link" href="/logout">Logout</a>
+        {% else %}
+          <a class="nav-link" href="/login">Login</a>
+          <a class="nav-link" href="/sign-up">Sign Up</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Content and Alerts -->
+    <div class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} custom-alert alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      <div class="container">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+
     <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
-{% block javascript %}
-  <script type="text/javascript">
-    function deleteNote(noteId) {
-      fetch("/delete-note", {
-        method: "POST",
-        body: JSON.stringify({ noteId: noteId }),
-      }).then((_res) => {
-        window.location.href = "/";
-      });
-      }
-  </script> 
-{% endblock %}
+    {% block javascript %}
+    {% endblock %}
   </body>
 </html>

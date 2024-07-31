@@ -19,7 +19,8 @@ class User(db.Model, UserMixin):
     posts = db.relationship('Post', backref='author', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy=True)
     forums = db.relationship('Forum', secondary=user_forum_association, back_populates='users')
-
+    is_admin = db.Column(db.Boolean, default=False)
+    
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String(10000))
