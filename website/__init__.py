@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
-UPLOAD_FOLDER = os.path.join('website', 'static', 'uploads')
+UPLOAD_FOLDER = 'website/static/uploads'
 
 def create_app():
     app = Flask(__name__, static_url_path='/static')

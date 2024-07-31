@@ -24,7 +24,7 @@
             {{ comment.content }}
 
             {% if current_user.is_authenticated %}
-            <form method="POST" action="{{ url_for('forums.reply_comment', forum_id=post.forum_id, post_id=post.id, comment_id=comment.id) }}" class="mt-3">
+            <form method="POST" action="{{ url_for('forums.reply_comment', forum_title=post.forum.title, post_id=post.id, comment_id=comment.id) }}" class="mt-3">
                 {{ form.hidden_tag() }}
                 {{ form.parent_id(id="parent_id", value=comment.id) }}
                 {{ form.content(class="form-control", placeholder="Reply to this comment") }}
@@ -32,7 +32,7 @@
             </form>
             {% endif %}
             
-            {% if comment.replies %}
+            {% if comment.replies.count() > 0 %}
             <ul class="list-unstyled ml-3">
                 {% for reply in comment.replies %}
                     {{ render_comment(reply) }}
@@ -52,7 +52,7 @@
 
 {% if user.is_authenticated %}
 <h3>Add a Comment</h3>
-<form method="POST" action="{{ url_for('forums.add_comment', forum_id=post.forum_id, post_id=post.id) }}">
+<form method="POST" action="{{ url_for('forums.add_comment', forum_title=post.forum.title, post_id=post.id) }}">
     {{ form.hidden_tag() }}
     {{ form.content(class="form-control", placeholder="Enter your comment") }}
     {{ form.submit(class="btn btn-primary") }}
