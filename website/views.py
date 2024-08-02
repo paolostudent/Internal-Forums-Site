@@ -4,12 +4,12 @@ from .models import Note
 from . import db
 import json
 
+# Create a Blueprint for the views
 views = Blueprint("views", __name__)
 
-
-@views.route("/",)  
-@views.route("/home", methods={'GET', 'POST'})
+# Route to render the home page
+@views.route("/",)
+@views.route("/home", methods=['GET', 'POST'])
 def home():
-     return render_template("home.html", user=current_user)
- 
-
+    # Render the home.html template with the current user
+    return render_template("home.html", user=current_user)

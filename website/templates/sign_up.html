@@ -1,77 +1,78 @@
-{% extends "base.html" %}
-{% block title %}Sign Up{% endblock %}
-{% block header_title %}Sign up{% endblock %}
-{% block content %}
+{% extends 'base.html' %}
 
-<div class="margin"></div>
-<form method="POST">
+{% block title %}
+  <!-- Title block for the page, setting the title to "Sign Up" -->
+  Sign Up
+{% endblock %}
+
+{% block header_title %}
+  <!-- Header title block, setting the header to "Sign up" -->
+  Sign up
+{% endblock %}
+
+{% block content %}
+  <!-- Main content block -->
+
+  <!-- Spacer for margin -->
+  <div class="margin"></div>
+
+  <!-- Form for user registration -->
+  <form method="POST">
+    <!-- Form group for email address input -->
     <div class="form-group">
-        <label for="email">Email Address</label>
-        <input
-            type="email"
-            class="form-control"
-            id="email"
-            name="email"
-            placeholder="Enter Email"
-            required
-        />
+      <!-- Label for email input field -->
+      <label for="email">Email Address</label>
+      <!-- Input field for email address -->
+      <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email" required />
     </div>
-    <br/>
+    <br />
+
+    <!-- Form group for first name input -->
     <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input
-            type="text"
-            class="form-control"
-            id="firstName"
-            name="firstName"
-            placeholder="Enter First Name"
-            required
-        />
+      <!-- Label for first name input field -->
+      <label for="firstName">First Name</label>
+      <!-- Input field for first name -->
+      <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" required />
     </div>
-    <br/>
+    <br />
+
+    <!-- Form group for password input -->
     <div class="form-group">
-        <label for="password1">Password</label>
-        <input
-            type="password"
-            class="form-control"
-            id="password1"
-            name="password1"
-            placeholder="Enter Password"
-            required
-        />
+      <!-- Label for password input field -->
+      <label for="password1">Password</label>
+      <!-- Input field for password -->
+      <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter Password" required />
     </div>
-    <br/>
+    <br />
+
+    <!-- Form group for password confirmation -->
     <div class="form-group">
-        <label for="password2">Confirm Password</label>
-        <input
-            type="password"
-            class="form-control"
-            id="password2"
-            name="password2"
-            placeholder="Enter Password"
-            required
-        />
+      <!-- Label for password confirmation input field -->
+      <label for="password2">Confirm Password</label>
+      <!-- Input field for password confirmation -->
+      <input type="password" class="form-control" id="password2" name="password2" placeholder="Enter Password" required />
     </div>
-    <br/>
+    <br />
+
+    <!-- Form group for selecting chosen subjects -->
     <div class="form-group">
-        <label for="forums">Select Forums</label>
-        <div id="forums">
-            {% for forum in forums %}
-                <div class="form-check">
-                    <input
-                        type="checkbox"
-                        class="form-check-input"
-                        id="forum_{{ forum.id }}"
-                        name="forums"
-                        value="{{ forum.id }}"
-                    />
-                    <label class="form-check-label" for="forum_{{ forum.id }}">{{ forum.title }}</label>
-                </div>
-            {% endfor %}
-        </div>
+      <!-- Label for subject selection -->
+      <label for="forums">Select Your 4 Chosen Subjects (Year 12 students take 4 chosen subjects, and compulsory English and Religious Education)</label>
+      <div id="forums">
+        <!-- Loop through the list of forums to create checkboxes for each subject -->
+        {% for forum in forums %}
+          <div class="form-check">
+            <!-- Checkbox for each subject -->
+            <input type="checkbox" class="form-check-input" id="forum_{{ forum.id }}" name="forums" value="{{ forum.id }}" />
+            <label class="form-check-label" for="forum_{{ forum.id }}">{{ forum.title }}</label>
+          </div>
+        {% endfor %}
+      </div>
     </div>
-    <br/>
+    <br />
+
+    <!-- Submit button for the form -->
     <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+  </form>
 
 {% endblock %}

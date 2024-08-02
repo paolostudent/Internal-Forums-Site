@@ -1,26 +1,36 @@
 {% macro render_comment(comment, form) %}
-<li class="media my-3">
+  <!-- List item for displaying a comment -->
+  <li class="media my-3">
     <div class="media-body">
-        <h5 class="mt-0 mb-1">{{ comment.author.first_name }} on {{ comment.date.strftime('%Y-%m-%d %H:%M:%S') }}</h5>
-        {{ comment.content }}
+      <!-- Header displaying the comment author's name and date -->
+      <h5 class="mt-0 mb-1">{{ comment.author.first_name }} on {{ comment.date.strftime('%Y-%m-%d %H:%M:%S') }}</h5>
+      <!-- Content of the comment -->
+      {{ comment.content }}
 
-        {% if current_user.is_authenticated %}
+      <!-- Check if the user is authenticated to display reply form -->
+      {% if current_user.is_authenticated %}
+        <!-- Form for replying to the comment -->
         <form method="POST" action="{{ url_for('forums.add_comment', forum_id=comment.post.forum_id, post_id=comment.post_id) }}" class="ml-3">
-            {{ form.hidden_tag() }}
-            <input type="hidden" name="parent_id" value="{{ comment.id }}">
-            <div class="form-group">
-                <textarea class="form-control" name="content" placeholder="Reply to this comment">{{ form.content.data }}</textarea>
-            </div>
-            <button type="submit" class="btn btn-secondary btn-sm">Reply</button>
+          <!-- Hidden tag for CSRF protection -->
+          {{ form.hidden_tag() }}
+          <!-- Hidden input to identify the parent comment -->
+          <input type="hidden" name="parent_id" value="{{ comment.id }}" />
+          <div class="form-group">
+            <!-- Textarea for the reply content -->
+            <textarea class="form-control" name="content" placeholder="Reply to this comment">{{ form.content.data }}</textarea>
+          </div>
+          <!-- Submit button for the reply form -->
+          <button type="submit" class="btn btn-secondary btn-sm">Reply</button>
         </form>
-        {% endif %}
+      {% endif %}
 
-        <ul class="list-unstyled">
-            {% for reply in comment.replies %}
-                {{ render_comment(reply, form) }}
-            {% endfor %}
-        </ul>
+      <!-- List of replies to the comment -->
+      <ul class="list-unstyled">
+        {% for reply in comment.replies %}
+          <!-- Recursively render each reply using the same macro -->
+          {{ render_comment(reply, form) }}
+        {% endfor %}
+      </ul>
     </div>
-</li>
+  </li>
 {% endmacro %}
-    

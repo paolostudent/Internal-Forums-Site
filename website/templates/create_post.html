@@ -1,23 +1,41 @@
-{% extends "base.html" %}
-{% block title %}Create Post{% endblock %}
-{% block header_title %}{{forum.title}}{% endblock %}
+{% extends 'base.html' %}  <!-- Extends the base template -->
+
+{% block title %}
+  Create Post  <!-- Sets the title of the page -->
+{% endblock %}
+
+{% block header_title %}
+  {{ forum.title }}  <!-- Sets the header title dynamically from the forum object -->
+{% endblock %}
+
 {% block content %}
-<div class="margin"></div>
-<h1>Create a New Post</h1>
-<form method="POST" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
+  <div class="margin"></div>  <!-- Adds margin for spacing -->
+  
+  <h1>Create a New Post</h1>  <!-- Heading for the page -->
+  
+  <!-- Form for creating a new post -->
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}  <!-- CSRF token for security -->
+    
+    <!-- Title input field -->
     <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-        {{ form.title(class="form-control", id="title", required=True) }}
+      <label for="title" class="form-label">Title</label>
+      {{ form.title(class='form-control', id='title', required=True) }}
     </div>
+    
+    <!-- Content textarea field -->
     <div class="mb-3">
-        <label for="content" class="form-label">Content</label>
-        {{ form.content(class="form-control", id="content", rows="5", required=True) }}
+      <label for="content" class="form-label">Content</label>
+      {{ form.content(class='form-control', id='content', rows='5', required=True) }}
     </div>
+    
+    <!-- Media upload input field -->
     <div class="mb-3">
-        <label for="media" class="form-label">Upload Media</label>
-        {{ form.media(class="form-control-file", id="media") }}
+      <label for="media" class="form-label">Upload Media</label>
+      {{ form.media(class='form-control-file', id='media') }}
     </div>
+    
+    <!-- Submit button -->
     <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+  </form>
 {% endblock %}

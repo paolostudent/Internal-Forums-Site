@@ -1,13 +1,29 @@
-{% extends "base.html" %}
-{% block title %}Forums{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}
+  <!-- Title block for the page, which sets the title to "Forums" -->
+  Forums
+{% endblock %}
+
 {% block content %}
-<h1>Forums</h1>
-<ul>
-    {% for forum in forums %}
-    <li>
-        <a href="{{ url_for('forums.view_forum', forum_title=forum.title) }}">{{ forum.title }}</a>
-        <p>{{ forum.description }}</p>
-    </li>
-    {% endfor %}
-</ul>
+  <!-- Container for the page content -->
+  <div class="content-container">
+    <div class="main-content">
+      <div class="container">
+        <h1>Forums</h1>
+        
+        <!-- List of forums -->
+        <ul>
+          {% for forum in forums %}
+            <li>
+              <!-- Link to view a specific forum, using the forum's title as a URL parameter -->
+              <a href="{{ url_for('forums.view_forum', forum_title=forum.title) }}">{{ forum.title }}</a>
+              <p>{{ forum.description }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}

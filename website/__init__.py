@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
-UPLOAD_FOLDER = 'website/static/uploads'
+UPLOAD_FOLDER = os.path.join('website', 'static', 'uploads')
 
 def create_app():
     app = Flask(__name__, static_url_path='/static')
@@ -17,6 +17,8 @@ def create_app():
     
     db.init_app(app)
     migrate = Migrate(app, db)
+    
+
     
     # Import and register blueprints
     from .views import views

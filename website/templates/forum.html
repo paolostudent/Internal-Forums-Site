@@ -1,25 +1,42 @@
 {% extends "base.html" %}
-{% block title %}{{ forum.title }}{% endblock %}
 
-{% block header_title %}{{ forum.title }}{% endblock %}
+{% block title %}
+<!-- Title block for the page, which displays the forum's title -->
+{{ forum.title }}
+{% endblock %}
+
+{% block header_title %}
+<!-- Header title block, displaying the forum's title in the header -->
+{{ forum.title }}
+{% endblock %}
 
 {% block content %}
+<!-- Main content block -->
+
+<!-- Spacer for margins -->
 <div class="margin"></div>
 
-<h1>Latest Posts!</h1>
+<!-- Container for the main content -->
+<div class="stayer">
+    <h1>Latest Posts!</h1>
 
+    <!-- List of posts -->
+    <ul>
+        {% for post in posts %}
+        <li>
+            <!-- Link to view the post with title and author information -->
+            <a href="{{ url_for('forums.view_post', forum_title=forum.title, post_id=post.id) }}">{{ post.title }}</a>
+            <p>by {{ post.author.first_name }} ({{ post.date }})</p>
+        </li>
+        {% endfor %}
+    </ul>
 
-<ul>
-    {% for post in posts %}
-    <li>
-        <a href="{{ url_for('forums.view_post', forum_title=forum.title, post_id=post.id) }}">{{ post.title }}</a> <p>by {{ post.author.first_name }} ({{ post.date }})</p>
-    </li>
-    {% endfor %}
-</ul>
+   <!-- Button to create a new post, visible only to authenticated users -->
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('forums.create_post', forum_title=forum.title) }}" class="btn btn-primary">Create Post</a>
+    {% else %}
+        <p>You must <a href="{{ url_for('auth.login') }}">log in</a> to create a post.</p>
+    {% endif %}
+</div>
 
-{% if current_user.is_authenticated %}
-    <a href="{{ url_for('forums.create_post', forum_title=forum.title) }}" class="btn btn-primary">Create Post</a>
-{% else %}
-    <p>You must <a href="{{ url_for('auth.login') }}">log in</a> to create a post.</p>
-{% endif %}
 {% endblock %}

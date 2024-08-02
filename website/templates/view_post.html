@@ -1,97 +1,116 @@
-{% extends "base.html" %}
-{% block title %}{{ post.title }}{% endblock %}
-{% block header_title %}{{ forum.title }}{% endblock %}
-{% block content %}
-<div class="margin"></div>
+{% extends 'base.html' %}
 
-<div class="card" style="width: 100%; margin: auto;">
-    <div class="card-body">
+{% block title %}
+  {{ post.title }}
+{% endblock %}
+
+{% block header_title %}
+  {{ forum.title }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="margin"></div>
+
+  <!-- Container for the post details -->
+  <div class="postcard">
+    <div class="card" style="width: 100%; margin: auto;">
+      <div class="card-body">
         <h5 class="card-title">{{ post.author.first_name }}</h5>
         <h5 class="card-title">{{ post.title }}</h5>
         <div class="card-text" style="border: 1px solid #dee2e6; padding: 10px; border-radius: 5px;">
-            <p>{{ post.content }}</p>
+          <p>{{ post.content }}</p>
         </div>
-        
+
+        <!-- Display media if available -->
         {% if post.media_filename %}
-            <div class="media-container mt-3">
-
-                <img src="{{ url_for('static', filename='uploads/' + post.media_filename) }}" alt="Media attachment" class="img-fluid">
-            </div>
+          <div class="media-container mt-3">
+            <img src="{{ url_for('static', filename='uploads/' + post.media_filename) }}" alt="Media attachment" class="img-fluid" />
+          </div>
         {% endif %}
-        
+
+        <!-- Display delete button if the user is the post author or an admin -->
         {% if current_user.id == post.user_id or current_user.is_admin %}
-            <form method="POST" action="{{ url_for('forums.delete_post', post_id=post.id) }}" style="display: inline;">
-                <button type="submit" class="btn btn-danger mt-3">Delete Post</button>
-            </form>
+          <form method="POST" action="{{ url_for('forums.delete_post', post_id=post.id) }}" style="display: inline;">
+            <button type="submit" class="btn btn-danger mt-3">Delete Post</button>
+          </form>
         {% endif %}
-        
+
+        <!-- Display post date and author information -->
         <div class="text-muted text-right mt-3">
-            <small>Posted by {{ post.author.first_name }} on {{ post.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+          <small>Posted by {{ post.author.first_name }} on {{ post.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<hr>
+  <hr />
 
-<h2>Comments</h2>
-<ul class="list-unstyled">
+  <!-- Section for displaying comments -->
+  <h2>Comments</h2>
+  <ul class="list-unstyled">
     {% macro render_comment(comment) %}
-    <li class="media my-3">
+      <li class="media my-3">
         <div class="card" style="width: 100%; margin-bottom: 10px;">
-            <div class="card-body">
-                <h5 class="card-title">{{ comment.author.first_name }}</h5>
-                
-                <div class="card-text" style="border: 1px solid #dee2e6; padding: 10px; border-radius: 5px;">
-                    <p>{{ comment.content }}</p>
-                    
-                </div>
-                <div class="text-muted text-right mt-3">
-                <small>({{ comment.date.strftime('%Y-%m-%d %H:%M:%S') }})</small>
-                </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ comment.author.first_name }}</h5>
 
-                {% if current_user.is_authenticated %}
-                    <form method="POST" action="{{ url_for('forums.reply_comment', forum_title=post.forum.title, post_id=post.id, comment_id=comment.id) }}" class="mt-3">
-                        {{ form.hidden_tag() }}
-                        {{ form.parent_id(id="parent_id", value=comment.id) }}
-                        {{ form.content(class="form-control", placeholder="Reply to this comment") }}
-                        {{ form.submit(class="btn btn-secondary btn-sm mt-2") }}
-                    </form>
-                {% endif %}
-
-                {% if current_user.id == comment.user_id or current_user.is_admin %}
-                    <form method="POST" action="{{ url_for('forums.delete_comment', post_id=post.id, comment_id=comment.id) }}" style="display: inline;">
-                        <button type="submit" class="btn btn-danger btn-sm mt-2">Delete Comment</button>
-                    </form>
-                {% endif %}
-
-                {% if comment.replies.count() > 0 %}
-                    <ul class="list-unstyled ml-3 mt-3">
-                        {% for reply in comment.replies %}
-                            {{ render_comment(reply) }}
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+            <div class="card-text" style="border: 1px solid #dee2e6; padding: 10px; border-radius: 5px;">
+              <p>{{ comment.content }}</p>
             </div>
+            <div class="text-muted text-right mt-3">
+              <small>({{ comment.date.strftime('%Y-%m-%d %H:%M:%S') }})</small>
+            </div>
+
+            <!-- Display reply form if user is authenticated -->
+            {% if current_user.is_authenticated %}
+              <form method="POST" action="{{ url_for('forums.reply_comment', forum_title=post.forum.title, post_id=post.id, comment_id=comment.id) }}" class="mt-3">
+                {{ form.hidden_tag() }}
+                {{ form.parent_id(id='parent_id', value=comment.id) }}
+                {{ form.content(class='form-control', placeholder='Reply to this comment') }}
+                {{ form.submit(class='btn btn-secondary btn-sm mt-2') }}
+              </form>
+            {% endif %}
+
+            <!-- Display delete button if user is the comment author or an admin -->
+            {% if current_user.id == comment.user_id or current_user.is_admin %}
+              <form method="POST" action="{{ url_for('forums.delete_comment', post_id=post.id, comment_id=comment.id) }}" style="display: inline;">
+                <button type="submit" class="btn btn-danger btn-sm mt-2">Delete Comment</button>
+              </form>
+            {% endif %}
+
+            <!-- Display replies to the comment if any -->
+            {% if comment.replies.count() > 0 %}
+              <ul class="list-unstyled ml-3 mt-3">
+                {% for reply in comment.replies %}
+                  {{ render_comment(reply) }}
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
         </div>
-    </li>
+      </li>
     {% endmacro %}
 
+    <!-- Loop through and render each comment -->
     {% for comment in comments %}
-        {{ render_comment(comment) }}
+      {{ render_comment(comment) }}
     {% endfor %}
-</ul>
+  </ul>
 
-<hr>
+  <hr />
 
-{% if user.is_authenticated %}
-<h3>Add a Comment</h3>
-<form method="POST" action="{{ url_for('forums.add_comment', forum_title=post.forum.title, post_id=post.id) }}">
-    {{ form.hidden_tag() }}
-    {{ form.content(class="form-control", placeholder="Enter your comment") }}
-    {{ form.submit(class="btn btn-primary mt-2") }}
-</form>
-{% else %}
-<p>You must <a href="{{ url_for('auth.login') }}">log in</a> to post a comment.</p>
-{% endif %}
-
+  <!-- Section for adding a new comment if the user is authenticated -->
+  {% if user.is_authenticated %}
+    <h3>Add a Comment</h3>
+    <form method="POST" action="{{ url_for('forums.add_comment', forum_title=post.forum.title, post_id=post.id) }}">
+      {{ form.hidden_tag() }}
+      {{ form.content(class='form-control', placeholder='Enter your comment') }}
+      {{ form.submit(class='btn btn-primary mt-2') }}
+    </form>
+  {% else %}
+    <p>
+      You must <a href="{{ url_for('auth.login') }}">log in</a> to post a comment.
+    </p>
+  {% endif %}
 {% endblock %}

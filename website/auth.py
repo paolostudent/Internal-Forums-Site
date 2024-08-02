@@ -7,11 +7,14 @@ from sqlalchemy.orm import joinedload
 
 auth = Blueprint('auth', __name__)
 
+
 @auth.route('/some_route')
 @login_required
 def some_route():
-    user = User.query.options(joinedload(User.forums)).filter_by(id=current_user.id).first()
+    user = User.query.options(joinedload(User.forums)).filter_by(
+        id=current_user.id).first()
     return render_template('some_template.html', user=user)
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -32,16 +35,19 @@ def login():
 
     return render_template("login.html", user=current_user)
 
+
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))
 
+
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
     # Fetch all forums except 'English' and 'Religious Education'
-    forums = Forum.query.filter(~Forum.title.in_(['English', 'Religious Education'])).all()
+    forums = Forum.query.filter(~Forum.title.in_(
+        ['English', 'Religious Education'])).all()
 
     if request.method == 'POST':
         email = request.form.get('email')
@@ -70,16 +76,19 @@ def sign_up():
             new_user = User(
                 email=email,
                 first_name=first_name,
-                password=generate_password_hash(password1, method='scrypt:32768:8:1'),
+                password=generate_password_hash(
+                    password1, method='scrypt:32768:8:1'),
                 is_admin=is_admin
             )
 
             # Assign selected forums
-            selected_forums = Forum.query.filter(Forum.id.in_(selected_forum_ids)).all()
+            selected_forums = Forum.query.filter(
+                Forum.id.in_(selected_forum_ids)).all()
 
             # Query for the 'English' and 'Religious Education' forums and add them
             english_forum = Forum.query.filter_by(title='English').first()
-            religious_education_forum = Forum.query.filter_by(title='Religious Education').first()
+            religious_education_forum = Forum.query.filter_by(
+                title='Religious Education').first()
             if english_forum:
                 selected_forums.append(english_forum)
             if religious_education_forum:
